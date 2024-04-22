@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -21,14 +22,36 @@ class User extends Authenticatable
 		'password',
 	];
 
+	protected $appends = ['full_name']; //se usa para los accedores (get)
+
 	protected $hidden = [
 		'password',
 		'remember_token',
 	];
 
-	// protected $casts = [
-	// 	'email_verified_at' => 'datetime',
-	// ];
+	protected $casts = [
+		'created_at' => 'datetime:Y-m-d',
+		'update_at' => 'datetime:Y-m-d',
+		// 'is_enable' => 'boolean' //0-1=> false - true
+	];
+
+
+	// accedores (get)
+	public function getFullNameAttribute()
+	{
+		return "{$this->name} {$this->last_name}";
+	}
+
+	// mutadores
+	public function setPasswordAttribute($value)
+	{
+		$this->attributes['password'] = bcrypt($value);
+	}
+
+	public function setRememberTokenAttribute()
+	{
+		$this->attributes['remember_token'] =  Str::random(30);
+	}
 
 	public function customerLends()
 	{

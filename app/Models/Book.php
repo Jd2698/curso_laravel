@@ -18,6 +18,7 @@ class Book extends Model
 		'description'
 	];
 
+	// Book::with('category','author')->get();
 	public function category()
 	{
 		return $this->belongsTo(Category::class, 'category_id', 'id');
