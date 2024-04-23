@@ -22,13 +22,15 @@ class User extends Authenticatable
 		'password',
 	];
 
-	protected $appends = ['full_name']; //se usa para los accedores (get)
+	//se usa para los accedores (get)
+	protected $appends = ['full_name'];
 
 	protected $hidden = [
 		'password',
 		'remember_token',
 	];
 
+	//modificar el formato de un campo
 	protected $casts = [
 		'created_at' => 'datetime:Y-m-d',
 		'update_at' => 'datetime:Y-m-d',
@@ -36,13 +38,13 @@ class User extends Authenticatable
 	];
 
 
-	// accedores (get)
+	// accedores (get) - al realizar una consulta
 	public function getFullNameAttribute()
 	{
 		return "{$this->name} {$this->last_name}";
 	}
 
-	// mutadores
+	// mutadores (set) - antes de subír algo
 	public function setPasswordAttribute($value)
 	{
 		$this->attributes['password'] = bcrypt($value);
