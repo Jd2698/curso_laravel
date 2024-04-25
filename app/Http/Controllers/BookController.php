@@ -11,8 +11,9 @@ class BookController extends Controller
 	//200 (consulta), 201 (crear), 204 (sin cuerpo)
 	public function index(Request $request)
 	{
-		$book = Book::get();
-		return response()->json(['books' => $book], 200);
+		$books = Book::get();
+		if (!$request->ajax()) return view('index', compact('books'));
+		return response()->json(['books' => $books], 200);
 	}
 
 	public function create()
