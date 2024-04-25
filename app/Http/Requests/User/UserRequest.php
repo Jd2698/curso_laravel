@@ -25,11 +25,10 @@ class UserRequest extends FormRequest
 		if ($this->method() == 'POST') {
 			array_push($rules['number_id'], 'unique:users,number_id');
 			array_push($rules['email'], 'unique:users,email');
-			array_push($rules['passowrd'], 'required');
+			array_push($rules['password'], 'required');
 		} else {
 			array_push($rules['number_id'], 'unique:users,number_id,' . $this->user->id);
 			array_push($rules['email'], 'unique:users,email,' . $this->user->id);
-			// array_push($rules['passowrd'], 'nullable');
 		}
 
 		return $rules;
