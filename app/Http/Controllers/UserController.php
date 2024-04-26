@@ -45,7 +45,11 @@ class UserController extends Controller
 
 	public function update(UserRequest $request, User $user)
 	{
-		$user->update($request->all());
+		$data = $request->all();
+		if ($data['password'] === null) {
+			unset($data['password']);
+		}
+		$user->fill($data)->save();
 		if (!$request->ajax()) return back()->with('success', 'User Updated');
 		return response()->json([], 204);
 	}
