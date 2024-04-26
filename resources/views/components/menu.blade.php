@@ -45,6 +45,12 @@
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                 Cerrar sesión
                             </a>
+                            <a class="dropdown-item" href="{{ route('books.index') }}">
+                                Books
+                            </a>
+                            <a class="dropdown-item" href="{{ route('users.index') }}">
+                                Users
+                            </a>
 
 
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
