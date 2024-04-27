@@ -12,7 +12,7 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::group(['middleware' => ['auth']], function () {
-	Route::group(['prefix' => 'users'], function () {
+	Route::group(['prefix' => 'users', 'middleware' => ['role:admin']], function () {
 		Route::get('/', [UserController::class, 'index'])->name('users.index');
 		Route::get('/create', [UserController::class, 'create'])->name('users.create');
 		Route::get('/{user}/edit', [UserController::class, 'edit'])->name('users.edit');

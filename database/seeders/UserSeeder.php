@@ -18,6 +18,6 @@ class UserSeeder extends Seeder
 			'email' => 'j.delgado2698@gmail.com',
 			'password' => '123456789',
 			'remember_token' => Str::random(10)
-		]);
+		])->assignRole('admin');
 	}
 }

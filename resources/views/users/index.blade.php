@@ -17,6 +17,7 @@
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Apellido</th>
                                 <th scope="col">Email</th>
+                                <th scope="col">Role</th>
                                 <th scope="col">Acciones</th>
                             </tr>
                         </thead>
@@ -27,6 +28,7 @@
                                     <th scope="row">{{ $user->name }}</th>
                                     <th scope="row">{{ $user->last_name }}</th>
                                     <th scope="row">{{ $user->email }}</th>
+                                    <th scope="row">{{ $user->roles[0]->name }}</th>
                                     <th scope="row">
                                         <div class="d-flex">
                                             <a href="{{ route('users.edit', ['user' => $user->id]) }}"
