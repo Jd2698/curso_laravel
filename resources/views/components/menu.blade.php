@@ -48,9 +48,14 @@
                             <a class="dropdown-item" href="{{ route('books.index') }}">
                                 Books
                             </a>
-                            @role('admin')
+                            @can('users.index')
                                 <a class="dropdown-item" href="{{ route('users.index') }}">
                                     Users
+                                </a>
+                            @endcan
+                            @role('admin|librarian')
+                                <a class="dropdown-item" href="{{ route('categories.index') }}">
+                                    Categories
                                 </a>
                             @endrole
 
