@@ -6,7 +6,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [BookController::class, 'index'])->name('books.index');
+Route::get('/', [BookController::class, 'home'])->name('books.home');
 
 Auth::routes();
 
@@ -32,7 +32,7 @@ Route::group(['middleware' => ['auth']], function () {
 	});
 
 	Route::group(['prefix' => 'books', 'controller' => BookController::class], function () {
-		// Route::get('/', 'index')->name('books.index');
+		Route::get('/', 'index')->name('books.index');
 		Route::get('/create', 'create')->name('books.create')->middleware('can:books.create');
 		Route::get('/{book}/edit', 'edit')->name('books.edit')->middleware('can:books.edit');
 		Route::post('/store', 'store')->name('books.store')->middleware('can:books.store');

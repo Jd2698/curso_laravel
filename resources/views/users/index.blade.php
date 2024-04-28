@@ -10,7 +10,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive my-4 mx-2">
-                    <table class="table table-bordered">
+                    <table id="user_table" class="table table-bordered">
                         <thead>
                             <tr>
                                 <th scope="col">Cedula</th>
@@ -32,12 +32,14 @@
                                     <th scope="row">
                                         <div class="d-flex">
                                             <a href="{{ route('users.edit', ['user' => $user->id]) }}"
-                                                class="btn btn-warning btn-sm">Editar</a>
+                                                class="btn btn-warning btn-sm"><i class="fas fa-user-edit"></i>
+                                            </a>
                                             <form action="{{ route('users.destroy', ['user' => $user->id]) }}"
                                                 method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button class="ms-2 btn btn-danger btn-sm">Eliminar</button>
+                                                <button class="ms-2 btn btn-danger btn-sm"><i
+                                                        class="fas fa-trash"></i></button>
                                             </form>
                                         </div>
                                     </th>
