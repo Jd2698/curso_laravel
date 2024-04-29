@@ -24,6 +24,7 @@ Route::group(['middleware' => ['auth']], function () {
 
 	Route::group(['prefix' => 'categories', 'controller' => CategoryController::class], function () {
 		Route::get('/', 'index')->name('categories.index')->middleware('can:categories.index');
+		Route::get('/get-all', 'index')->name('categories.get-all')->middleware('can:categories.get-all');
 		Route::get('/create', 'create')->name('categories.create')->middleware('can:categories.create');
 		Route::get('/{category}/edit', 'edit')->name('categories.edit')->middleware('can:categories.edit');
 		Route::post('/store', 'store')->name('categories.store')->middleware('can:categories.store');
