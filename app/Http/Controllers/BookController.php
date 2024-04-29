@@ -24,11 +24,6 @@ class BookController extends Controller
 		return response()->json(['books' => $books], 200);
 	}
 
-	public function create()
-	{
-		//
-	}
-
 	public function store(BookRequest $request)
 	{
 		$book = new Book($request->all());
@@ -39,11 +34,6 @@ class BookController extends Controller
 	public function show(Request $request, Book $book)
 	{
 		return response()->json(['Book' => $book], 200);
-	}
-
-	public function edit($id)
-	{
-		//
 	}
 
 	public function update(BookRequest $request, Book $book)

@@ -53,9 +53,9 @@ class UserController extends Controller
 	{
 		$data = $request->all();
 		if ($data['password'] === null) {
-			unset($data['password']);
+			unset($data['password'], $data['password_confirmation']);
 		}
-		$user->fill($data)->save();
+		$user->update($data);
 		$user->syncRoles([$request->role]);
 
 		if (!$request->ajax()) return back()->with('success', 'User Updated');

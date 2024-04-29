@@ -23,7 +23,14 @@
 								<td>{{book.category.name}}</td>
 								<td>{{book.stock}}</td>
 								<td>
-									<button class="btn btn-primary">hola</button>
+									<div class="d-flex justify-content-center gap-2">
+										<button type="button" class="btn btn-success" title="Editar" @click="editBook(book)">
+											<i class="fas fa-pen"></i>
+										</button>
+										<button type="button" class="btn btn-danger" title="Eliminar" @click="deleteBook(book)">
+											<i class="fas fa-trash"></i>
+										</button>
+									</div>
 								</td>
 							</tr>
 						</tbody>
@@ -31,7 +38,7 @@
 				</div>
 			</div>
 			<div>
-				<book-modal :authors_data="authors_data" />
+				<book-modal :authors_data="authors_data" :book_data="book" ref="book_modal" />
 			</div>
 		</div>
 	</section>
@@ -47,7 +54,8 @@
 		props: ['books', 'authors_data'],
 		data() {
 			return {
-				modal: null
+				modal: null,
+				book: {}
 			}
 		},
 		mounted() {
@@ -58,8 +66,10 @@
 				$('#book_table').DataTable()
 				const modal_id = document.getElementById('book_modal')
 				this.modal = new bootstrap.Modal(modal_id)
+
+				console.log(this.$refs.book_modal)
 				modal_id.addEventListener('hidden.bs.modal', e => {
-					// this.$refs.book_modal.reset()
+					this.$refs.book_modal.reset()
 				})
 			},
 			openModal() {
@@ -67,6 +77,18 @@
 			},
 			closeModal() {
 				this.modal.hide()
+			},
+			editBook(book) {
+				this.book = book
+				this.openModal()
+			},
+			async deleteBook({ id }) {
+				try {
+					await axios.delete(`/books/${id}`)
+					window.location.reload()
+				} catch (error) {
+					console.error(error)
+				}
 			}
 		}
 	}

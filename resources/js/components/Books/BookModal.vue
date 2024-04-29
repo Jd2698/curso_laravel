@@ -6,7 +6,7 @@
 					<h5 class="modal-title">{{is_create ? 'crear':'editar'}} libro</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<Form @submit="saveBook" :validation-schema="schema">
+				<Form @submit="saveBook" :validation-schema="schema" ref="form">
 					<div class="modal-body">
 						<section class="row">
 
@@ -78,8 +78,17 @@
 	import * as yup from 'yup'
 
 	export default {
-		props: ['authors_data'],
+		props: ['authors_data', 'book_data'],
 		components: { Field, Form },
+		watch: {
+			book_data(new_value) {
+				this.book = new_value
+				if (!this.book.id) return
+				this.is_create = false
+				this.author = this.book.author_id
+				this.category = this.book.category_id
+			}
+		},
 		computed: {
 			schema() {
 				return yup.object({
@@ -124,14 +133,23 @@
 				try {
 					this.book.category_id = this.category
 					this.book.author_id = this.author
-					await axios.post('/books/store', this.book)
+
+					if (this.is_create) await axios.post('/books/store', this.book)
+					else await axios.put(`/books/${this.book.id}`, this.book)
 
 					await Swal.fire('success', 'felicidades')
-					// window.location.reload()
-					this.$parent.closeModal()
+					window.location.reload()
 				} catch (error) {
 					console.error(error)
 				}
+			},
+			reset() {
+				this.is_create = true
+				this.book = {}
+				this.author = null
+				this.category = null
+				this.$parent.book = {}
+				setTimeout(() => this.$refs.form.resetForm(), 100)
 			}
 		}
 	}
