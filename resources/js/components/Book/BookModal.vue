@@ -6,6 +6,9 @@
 					<h5 class="modal-title">{{is_create ? 'crear':'editar'}} libro</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
+
+				<backend-error :errors="back_errors" />
+
 				<Form @submit="saveBook" :validation-schema="schema" ref="form">
 					<div class="modal-body">
 						<section class="row">
@@ -14,8 +17,9 @@
 							<div class="col-12">
 								<label for="title">Titulo</label>
 								<Field name="title" v-slot="{ errorMessage, field }" v-model="book.title">
-									<input type="text" id="title" v-model="book.title" :class="`form-control ${errorMessage ? 'is-invalid' : ''}`" v-bind="field">
+									<input type="text" id="title" v-model="book.title" :class="`form-control ${errorMessage || back_errors['title'] ? 'is-invalid' : ''}`" v-bind="field">
 									<span class="invalid-feedback">{{ errorMessage }}</span>
+									<span class="invalid-feedback">{{ back_errors['title'] }}</span>
 								</Field>
 							</div>
 
@@ -23,8 +27,9 @@
 							<div class="col-12 mt-2">
 								<Field name="stock" v-slot="{ errorMessage, field }" v-model="book.stock">
 									<label for="stock">Cantidad</label>
-									<input type="number" id="stock" v-model="book.stock" :class="`form-control ${errorMessage ? 'is-invalid' : ''}`" v-bind="field">
+									<input type="number" id="stock" v-model="book.stock" :class="`form-control ${errorMessage || back_errors['stock'] ? 'is-invalid' : ''}`" v-bind="field">
 									<span class="invalid-feedback">{{ errorMessage }}</span>
+									<span class="invalid-feedback">{{ back_errors['stock'] }}</span>
 								</Field>
 							</div>
 
@@ -42,10 +47,12 @@
 								<Field name="author" v-slot="{ errorMessage, field }" v-model="author">
 									<label for="author">Autor</label>
 
-									<v-select :options="authors_data" label="name" v-model="author" :reduce="author => author.id" v-bind="field" placeholder="Seleccione autor" :clearable="false" :class="`${errorMessage ? 'is-invalid' : ''}`">
+									<v-select :options="authors_data" label="name" v-model="author" :reduce="author => author.id" v-bind="field" placeholder="Seleccione autor" :clearable="false" :class="`${errorMessage || back_errors['author'] ? 'is-invalid' : ''}`">
 									</v-select>
 
 									<span class="invalid-feedback">{{ errorMessage }}</span>
+									<span class="invalid-feedback">{{ back_errors['author'] }}</span>
+
 								</Field>
 							</div>
 
@@ -54,9 +61,10 @@
 								<Field name="category" v-slot="{ errorMessage, field, valid }" v-model="category">
 									<label for="category">Categoria</label>
 
-									<v-select id="category" :options="categories_data" v-model="category" :reduce="category => category.id" v-bind="field" label="name" placeholder="Selecciona categoria" :clearable="false" :class="`${errorMessage ? 'is-invalid' : ''}`">
+									<v-select id="category" :options="categories_data" v-model="category" :reduce="category => category.id" v-bind="field" label="name" placeholder="Selecciona categoria" :clearable="false" :class="`${errorMessage || back_errors['category'] ? 'is-invalid' : ''}`">
 									</v-select>
 									<span class="invalid-feedback" v-if="!valid">{{ errorMessage }}</span>
+									<span class="invalid-feedback">{{ back_errors['category'] }}</span>
 
 								</Field>
 							</div>
@@ -76,13 +84,14 @@
 <script>
 	import { Field, Form } from 'vee-validate'
 	import * as yup from 'yup'
+	import { successMessage, handlerErrors } from '@/helpers/Alerts.js'
 
 	export default {
 		props: ['authors_data', 'book_data'],
 		components: { Field, Form },
 		watch: {
 			book_data(new_value) {
-				this.book = new_value
+				this.book = { ...new_value }
 				if (!this.book.id) return
 				this.is_create = false
 				this.author = this.book.author_id
@@ -92,8 +101,8 @@
 		computed: {
 			schema() {
 				return yup.object({
-					title: yup.string().required(),
-					stock: yup.number().required().positive().integer(),
+					// title: yup.string().required(),
+					// stock: yup.number().required().positive().integer(),
 					description: yup.string(),
 					author: yup.string().required(),
 					category: yup.string().required()
@@ -107,7 +116,8 @@
 				author: null,
 				category: null,
 				load_category: false,
-				categories_data: []
+				categories_data: [],
+				back_errors: {}
 			}
 		},
 		mounted() {
@@ -126,7 +136,7 @@
 
 					this.load_category = true
 				} catch (error) {
-					console.error(error)
+					await handlerErrors(error)
 				}
 			},
 			async saveBook() {
@@ -137,10 +147,10 @@
 					if (this.is_create) await axios.post('/books/store', this.book)
 					else await axios.put(`/books/${this.book.id}`, this.book)
 
-					await Swal.fire('success', 'felicidades')
-					window.location.reload()
+					successMessage({ is_delete: false, reload: true })
 				} catch (error) {
-					console.error(error)
+					this.back_errors = await handlerErrors(error)
+					console.log(this.back_errors)
 				}
 			},
 			reset() {
@@ -148,7 +158,9 @@
 				this.book = {}
 				this.author = null
 				this.category = null
+				this.back_errors = { none: '' }
 				this.$parent.book = {}
+
 				setTimeout(() => this.$refs.form.resetForm(), 100)
 			}
 		}

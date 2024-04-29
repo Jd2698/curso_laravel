@@ -46,6 +46,8 @@
 
 <script>
 	import BookModal from './BookModal.vue'
+	import { deleteMessage, successMessage, handlerErrors } from '@/helpers/Alerts.js'
+
 	export default {
 		components: {
 			BookModal
@@ -67,7 +69,6 @@
 				const modal_id = document.getElementById('book_modal')
 				this.modal = new bootstrap.Modal(modal_id)
 
-				console.log(this.$refs.book_modal)
 				modal_id.addEventListener('hidden.bs.modal', e => {
 					this.$refs.book_modal.reset()
 				})
@@ -83,11 +84,12 @@
 				this.openModal()
 			},
 			async deleteBook({ id }) {
+				if (!(await deleteMessage())) return
 				try {
 					await axios.delete(`/books/${id}`)
-					window.location.reload()
+					successMessage({ is_delete: true, reload: true })
 				} catch (error) {
-					console.error(error)
+					handlerErrors(error)
 				}
 			}
 		}
