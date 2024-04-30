@@ -158,8 +158,8 @@
 				this.book = {}
 				this.author = null
 				this.category = null
-				this.back_errors = { none: '' }
 				this.$parent.book = {}
+				this.back_errors = {}
 
 				setTimeout(() => this.$refs.form.resetForm(), 100)
 			}
