@@ -36,7 +36,8 @@ Route::group(['middleware' => ['auth']], function () {
 		Route::get('/', 'index')->name('books.index');
 		Route::get('/{book}', 'show')->name('books.show')->middleware('can:books.show');
 		Route::post('/store', 'store')->name('books.store')->middleware('can:books.store');
-		Route::put('/{book}', 'update')->name('books.update')->middleware('can:books.update');
+		//se usa post para update, porque se envia un form y laravel no acepta con put
+		Route::post('/update/{book}', 'update')->name('books.update')->middleware('can:books.update');
 		Route::delete('/{book}', 'destroy')->name('books.destroy')->middleware('can:books.destroy');
 	});
 });

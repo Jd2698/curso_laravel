@@ -13,6 +13,20 @@
 					<div class="modal-body">
 						<section class="row">
 
+							<!-- Show Image -->
+							<div class="col-12 d-flex justify-content-center mt-1">
+								<img :src="image_preview" alt="Imagen Libro" class="img-thumbnail" width="170" height="170">
+							</div>
+
+							<!-- Load Image -->
+							<div class="col-12 mt-1 ">
+								<label for="file" class="form-label">Imagen</label>
+								<input type="file" :class="`form-control ${back_errors['file'] ? 'is-invalid' : ''}`" id="file" accept="image/*" @change="previewImage">
+								<span class="invalid-feedback" v-if="back_errors['file']">
+									{{ back_errors['file'] }}
+								</span>
+							</div>
+
 							<!-- Title -->
 							<div class="col-12">
 								<label for="title">Titulo</label>
@@ -96,13 +110,14 @@
 				this.is_create = false
 				this.author = this.book.author_id
 				this.category = this.book.category_id
+				this.image_preview = this.book.file.route
 			}
 		},
 		computed: {
 			schema() {
 				return yup.object({
-					// title: yup.string().required(),
-					// stock: yup.number().required().positive().integer(),
+					title: yup.string().required(),
+					stock: yup.number().required().positive().integer(),
 					description: yup.string(),
 					author: yup.string().required(),
 					category: yup.string().required()
@@ -117,7 +132,9 @@
 				category: null,
 				load_category: false,
 				categories_data: [],
-				back_errors: {}
+				back_errors: {},
+				file: null,
+				image_preview: '/storage/images/books/default.png'
 			}
 		},
 		mounted() {
@@ -144,14 +161,27 @@
 					this.book.category_id = this.category
 					this.book.author_id = this.author
 
-					if (this.is_create) await axios.post('/books/store', this.book)
-					else await axios.put(`/books/${this.book.id}`, this.book)
+					const book = this.createFormData(this.book)
+					if (this.is_create) await axios.post('/books/store', book)
+					else await axios.post(`/books/update/${this.book.id}`, book)
 
 					successMessage({ is_delete: false, reload: true })
 				} catch (error) {
 					this.back_errors = await handlerErrors(error)
-					console.log(this.back_errors)
+					// console.log(this.back_errors)
 				}
+			},
+			createFormData(data) {
+				const form_data = new FormData()
+				if (this.file) form_data.append('file', this.file, this.file.name)
+				for (const prop in data) {
+					form_data.append(prop, data[prop])
+				}
+				return form_data
+			},
+			previewImage(event) {
+				this.file = event.target.files[0]
+				this.image_preview = URL.createObjectURL(this.file)
 			},
 			reset() {
 				this.is_create = true
@@ -160,6 +190,9 @@
 				this.category = null
 				this.$parent.book = {}
 				this.back_errors = {}
+				this.file = null
+				this.image_preview = '/storage/images/books/default.png'
+				document.getElementById('file').value = ''
 
 				setTimeout(() => this.$refs.form.resetForm(), 100)
 			}

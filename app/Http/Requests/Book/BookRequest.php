@@ -9,6 +9,15 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class BookRequest extends FormRequest
 {
+	protected $rules = [
+		'title' => ['required', 'string'],
+		'description' => ['required', 'string'],
+		'stock' => ['required', 'numeric'],
+		'author_id' => ['required', 'exists:authors,id'],
+		'category_id' => ['required', 'exists:categories,id'],
+		'file' => ['required', 'image']
+	];
+
 	public function authorize()
 	{
 		return true;
@@ -16,15 +25,7 @@ class BookRequest extends FormRequest
 
 	public function rules()
 	{
-		$rules = [
-			'title' => ['required', 'string'],
-			'stock' => ['required', 'numeric'],
-			'description' => ['required', 'string'],
-			'category_id' => ['required', Rule::exists(Category::class, 'id')],
-			'author_id' => ['required', 'exists:authors,id']
-		];
-
-		return $rules;
+		return $this->rules;
 	}
 	public function messages()
 	{
