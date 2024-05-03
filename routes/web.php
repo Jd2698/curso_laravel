@@ -25,11 +25,14 @@ Route::group(['middleware' => ['auth']], function () {
 	Route::group(['prefix' => 'categories', 'controller' => CategoryController::class], function () {
 		Route::get('/', 'index')->name('categories.index')->middleware('can:categories.index');
 		Route::get('/get-all', 'index')->name('categories.get-all')->middleware('can:categories.get-all');
+		Route::get('/get-all-dt', 'getAll')->name('categories.get-all-db');
+		Route::get('/{category}', 'show')->name('categories.show');
+
 		Route::get('/create', 'create')->name('categories.create')->middleware('can:categories.create');
 		Route::get('/{category}/edit', 'edit')->name('categories.edit')->middleware('can:categories.edit');
 		Route::post('/store', 'store')->name('categories.store')->middleware('can:categories.store');
 		Route::put('/{category}', 'update')->name('categories.update')->middleware('can:categories.update');
-		Route::delete('/{category}', 'destroy')->name('categories.destroy')->middleware('can:categories.destory');
+		Route::delete('/{category}', 'destroy')->name('categories.destroy');
 	});
 
 	Route::group(['prefix' => 'books', 'controller' => BookController::class], function () {
