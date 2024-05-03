@@ -19,24 +19,29 @@
 		</div>
 	</div>
 	<div v-if="load_modal">
-		<h1>Hola Mundo</h1>
-		<!-- <category-modal :category_data="category" /> -->
+		<!-- <h1>Hola Mundo</h1> -->
+		<category-modal :category_data="category" />
 	</div>
 </template>
 
 <script>
 	import { ref, onMounted } from 'vue'
+	import CategoryModal from './CategoryModal.vue'
+	import handlerModal from '@/helpers/HandlerModal.js'
 	import { successMessage, handlerErrors, deleteMessage } from '@/helpers/Alerts.js'
 
 	export default {
-		// props: [],
+		components: { CategoryModal },
 		setup(/* props */) {
 			/* se monta en beforeCreated */
-			const load_modal = ref(false)
-			const table = ref(null)
-			const category = ref(null)
 
-			onMounted(() => mounteTable())
+			const categories = ref(null)
+			const category = ref(null)
+			const table = ref(null)
+			const { openModal, closeModal, load_modal } = handlerModal()
+
+			onMounted(() => index())
+			const index = () => mounteTable()
 
 			const mounteTable = () => {
 				table.value = $('#category_table').DataTable({
@@ -57,43 +62,17 @@
 							searchable: false,
 							render: (data, type, row, meta) => {
 								return `<div class="d-flex justify-content-center" data-role='actions'>
-														            <button onclick='event.preventDefault();' data-id='${row.id}' role='edit' class="btn btn-warning btn-sm">
-														              <i class='fas fa-pencil-alt' data-id='${row.id}' role='edit'></i>
-																				</button>
-														            <button onclick='event.preventDefault();' data-id='${row.id}' role='delete' class="btn btn-danger btn-sm ms-1">
-														            	<i class='fas fa-trash-alt' data-id='${row.id}' role='delete'></i>
-																				</button>
-														          </div>`
+																																																																            <button onclick='event.preventDefault();' data-id='${row.id}' role='edit' class="btn btn-warning btn-sm">
+																																																																              <i class='fas fa-pencil-alt' data-id='${row.id}' role='edit'></i>
+																																																																						</button>
+																																																																            <button onclick='event.preventDefault();' data-id='${row.id}' role='delete' class="btn btn-danger btn-sm ms-1">
+																																																																            	<i class='fas fa-trash-alt' data-id='${row.id}' role='delete'></i>
+																																																																						</button>
+																																																																          </div>`
 							}
 						}
 					]
 				})
-			}
-
-			const createCategory = () => {
-				load_modal.value = true
-			}
-
-			const editCategory = async id => {
-				try {
-					const { data } = await axios.get(`/categories/${id}`)
-					category.value = data.category
-					console.log(category.value)
-					// await openModal('category_modal')
-				} catch (error) {
-					await handlerErrors(error)
-				}
-			}
-
-			const deleteCategory = async id => {
-				if (!(await deleteMessage())) return
-				try {
-					await axios.delete(`/categories/${id}`)
-					await successMessage({ is_delete: true })
-					// reloadState()
-				} catch (error) {
-					await handlerErrors(error)
-				}
 			}
 
 			const handleAction = event => {
@@ -107,7 +86,46 @@
 				}
 			}
 
-			return { handleAction, createCategory, load_modal }
+			const createCategory = async () => {
+				category.value = null
+				await openModal('category_modal')
+			}
+
+			const editCategory = async id => {
+				try {
+					const { data } = await axios.get(`/categories/${id}`)
+					category.value = data.category
+					await openModal('category_modal')
+				} catch (error) {
+					await handlerErrors(error)
+				}
+			}
+
+			const deleteCategory = async id => {
+				if (!(await deleteMessage())) return
+				try {
+					await axios.delete(`/categories/${id}`)
+					await successMessage({ is_delete: true })
+					reloadState()
+				} catch (error) {
+					await handlerErrors(error)
+				}
+			}
+			const reloadState = () => {
+				table.value.destroy()
+				index()
+			}
+			return {
+				categories,
+				category,
+				load_modal,
+				editCategory,
+				deleteCategory,
+				createCategory,
+				closeModal,
+				reloadState,
+				handleAction
+			}
 		}
 	}
 </script>

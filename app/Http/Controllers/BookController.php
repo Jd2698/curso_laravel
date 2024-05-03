@@ -16,7 +16,7 @@ class BookController extends Controller
 	//200 (consulta), 201 (crear), 204 (sin cuerpo)
 	public function home(Request $request)
 	{
-		$books = Book::with('author', 'category', 'file')->get();
+		$books = Book::with('author', 'category', 'file')->whereHas('category')->get();
 		if (!$request->ajax()) return view('index', compact('books'));
 	}
 
